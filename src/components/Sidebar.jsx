@@ -7,6 +7,7 @@ import {
   MessageSquare,
   Map,
   BarChart2,
+  ListChecks,
   Settings,
   Menu,
   X,
@@ -18,6 +19,7 @@ const menuItems = [
   { name: "Berita", icon: <Newspaper />, path: "/berita" },
   { name: "Testimoni", icon: <MessageSquare />, path: "/testimoni" },
   { name: "Sebaran Universitas", icon: <Map />, path: "/sebaran" },
+  { name: "Program", icon: <ListChecks />, path: "/program" },
   { name: "Analytics", icon: <BarChart2 />, path: "/analytics" },
   { name: "Setting", icon: <Settings />, path: "/setting" },
 ];

@@ -11,6 +11,7 @@ import PageLoader from "./components/PageLoader"; // ⬅️ Import Loader
 
 // Pages...
 import Dashboard from "./pages/Dashboard";
+import Program from "./pages/Program";
 import Alumni from "./pages/Alumni";
 import Berita from "./pages/Berita";
 import Testimoni from "./pages/Testimoni";
@@ -55,6 +56,7 @@ const AppRoutesWithLoader = () => {
                   <Route path="/berita" element={<Berita />} />
                   <Route path="/testimoni" element={<Testimoni />} />
                   <Route path="/sebaran" element={<Sebaran />} />
+                  <Route path="/program" element={<Program />} />
                   <Route path="/analytics" element={<Analytics />} />
                   <Route path="/setting" element={<Setting />} />
                   <Route
