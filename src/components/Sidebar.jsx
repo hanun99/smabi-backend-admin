@@ -8,6 +8,7 @@ import {
   Map,
   BarChart2,
   ListChecks,
+  Banknote,
   Settings,
   Menu,
   X,
@@ -20,6 +21,7 @@ const menuItems = [
   { name: "Testimoni", icon: <MessageSquare />, path: "/testimoni" },
   { name: "Sebaran Universitas", icon: <Map />, path: "/sebaran" },
   { name: "Program", icon: <ListChecks />, path: "/program" },
+  { name: "Biaya Pendidikan", icon: <Banknote />, path: "/biaya-pendidikan" },
   { name: "Analytics", icon: <BarChart2 />, path: "/analytics" },
   { name: "Setting", icon: <Settings />, path: "/setting" },
 ];

@@ -4,10 +4,10 @@ import supabase from "../utils/SupaClient";
 import Swal from "sweetalert2";
 import "sweetalert2/dist/sweetalert2.min.css";
 import Pagination from "../components/Pagination";
-import ProgramModal from "../components/ProgramModal";
+import BiayaProgramModal from "../components/BiayaPendidikanModal";
 
-const Program = () => {
-  const [dataProgram, setDataProgram] = useState([]);
+const BiayaPendidikan = () => {
+  const [dataBiaya, setDataBiaya] = useState([]);
   const [loading, setLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 7;
@@ -18,22 +18,22 @@ const Program = () => {
   const [searchTerm, setSearchTerm] = useState("");
 
   useEffect(() => {
-    fetchProgram();
+    fetchBiayaProgram();
   }, []);
 
-  const fetchProgram = async () => {
+  const fetchBiayaProgram = async () => {
     setLoading(true);
     try {
       const { data, error } = await supabase
-        .from("program_unggulan")
+        .from("biaya_pendidikan")
         .select("*")
         .order("id", { ascending: false });
 
       if (error) {
-        console.error("Gagal mengambil data program:", error.message);
+        console.error("Gagal mengambil data biaya program:", error.message);
         Swal.fire("Error", `Gagal mengambil data: ${error.message}`, "error");
       } else {
-        setDataProgram(data || []);
+        setDataBiaya(data || []);
       }
     } catch (error) {
       console.error("Error fetching data:", error);
@@ -42,32 +42,71 @@ const Program = () => {
     setLoading(false);
   };
 
-  const handleLihat = (program) => {
+  const formatCurrency = (amount) => {
+    return new Intl.NumberFormat("id-ID", {
+      style: "currency",
+      currency: "IDR",
+      minimumFractionDigits: 0,
+    }).format(amount);
+  };
+
+  const handleLihat = (biaya) => {
+    let itemsList = "";
+    if (biaya.items && biaya.items.length > 0) {
+      itemsList = biaya.items
+        .map((item) => `<li class="mb-1">• ${item}</li>`)
+        .join("");
+    }
+
     Swal.fire({
-      title: program.nama_program,
+      title: biaya.title,
       html: `
-        <img src="${program.foto_url}" alt="gambar" class="w-full rounded-lg mb-3" />
-        <p>${program.deskripsi}</p>
+        <div class="text-left">
+          <div class="mb-4">
+            <h4 class="font-semibold text-lg text-green-600 mb-2">Harga: ${formatCurrency(
+              biaya.price
+            )}</h4>
+          </div>
+          <div class="mb-4">
+            <h4 class="font-semibold mb-2">Deskripsi:</h4>
+            <p class="text-gray-700">${
+              biaya.description || "Tidak ada deskripsi"
+            }</p>
+          </div>
+          ${
+            itemsList
+              ? `
+            <div>
+              <h4 class="font-semibold mb-2">Item yang Termasuk:</h4>
+              <ul class="text-gray-700 text-sm">
+                ${itemsList}
+              </ul>
+            </div>
+          `
+              : ""
+          }
+        </div>
       `,
       width: 600,
       confirmButtonText: "Tutup",
+      confirmButtonColor: "#6366f1",
     });
   };
 
   const handleEdit = (id) => {
-    const program = dataProgram.find((p) => p.id === id);
-    if (program) {
+    const biaya = dataBiaya.find((b) => b.id === id);
+    if (biaya) {
       setIsEdit(true);
-      setEditData(program);
+      setEditData(biaya);
       setShowModal(true);
     } else {
-      Swal.fire("Error", "Data program tidak ditemukan", "error");
+      Swal.fire("Error", "Data biaya program tidak ditemukan", "error");
     }
   };
 
   const handleDelete = async (id) => {
     const konfirmasi = await Swal.fire({
-      title: "Hapus Program?",
+      title: "Hapus Biaya Program?",
       text: "Data yang dihapus tidak dapat dikembalikan!",
       icon: "warning",
       showCancelButton: true,
@@ -80,7 +119,7 @@ const Program = () => {
     if (konfirmasi.isConfirmed) {
       try {
         const { error } = await supabase
-          .from("program_unggulan")
+          .from("biaya_pendidikan")
           .delete()
           .eq("id", id);
 
@@ -88,80 +127,102 @@ const Program = () => {
           console.error("Delete error:", error);
           Swal.fire(
             "Gagal",
-            `Program gagal dihapus: ${error.message}`,
+            `Biaya program gagal dihapus: ${error.message}`,
             "error"
           );
         } else {
-          setDataProgram(dataProgram.filter((item) => item.id !== id));
-          Swal.fire("Terhapus", "Program berhasil dihapus", "success");
+          setDataBiaya(dataBiaya.filter((item) => item.id !== id));
+          Swal.fire("Terhapus", "Biaya program berhasil dihapus", "success");
         }
       } catch (error) {
         console.error("Delete error:", error);
-        Swal.fire("Gagal", "Terjadi kesalahan saat menghapus program", "error");
+        Swal.fire(
+          "Gagal",
+          "Terjadi kesalahan saat menghapus biaya program",
+          "error"
+        );
       }
     }
   };
 
-  const handleSaveProgram = async (programData) => {
+  const handleSaveBiaya = async (biayaData) => {
     try {
       if (isEdit && editData) {
         // UPDATE
         const { data: updatedData, error } = await supabase
-          .from("program_unggulan")
+          .from("biaya_pendidikan")
           .update({
-            nama_program: programData.nama_program,
-            deskripsi: programData.deskripsi,
-            foto_url: programData.foto_url,
+            title: biayaData.title,
+            price: biayaData.price,
+            description: biayaData.description,
+            items: biayaData.items,
           })
           .eq("id", editData.id)
           .select();
 
         if (error) {
           console.error("Update error:", error);
-          Swal.fire("Gagal", `Edit program gagal: ${error.message}`, "error");
+          Swal.fire(
+            "Gagal",
+            `Edit biaya program gagal: ${error.message}`,
+            "error"
+          );
         } else {
           // Update state local dengan data baru
-          setDataProgram((prevData) =>
+          setDataBiaya((prevData) =>
             prevData.map((item) =>
-              item.id === editData.id ? { ...item, ...programData } : item
+              item.id === editData.id ? { ...item, ...biayaData } : item
             )
           );
 
           // Atau refresh data dari server
-          await fetchProgram();
+          await fetchBiayaProgram();
 
           setShowModal(false);
           setIsEdit(false);
           setEditData(null);
-          Swal.fire("Berhasil", "Program berhasil diupdate", "success");
+          Swal.fire("Berhasil", "Biaya program berhasil diupdate", "success");
         }
       } else {
         // INSERT - untuk data baru
         const { data: newData, error } = await supabase
-          .from("program_unggulan")
+          .from("biaya_pendidikan")
           .insert([
             {
-              nama_program: programData.nama_program,
-              deskripsi: programData.deskripsi,
-              foto_url: programData.foto_url,
+              title: biayaData.title,
+              price: biayaData.price,
+              description: biayaData.description,
+              items: biayaData.items,
             },
           ])
           .select();
 
         if (error) {
           console.error("Insert error:", error);
-          Swal.fire("Gagal", `Tambah program gagal: ${error.message}`, "error");
+          Swal.fire(
+            "Gagal",
+            `Tambah biaya program gagal: ${error.message}`,
+            "error"
+          );
         } else {
           // Refresh data dari server
-          await fetchProgram();
+          await fetchBiayaProgram();
 
           setShowModal(false);
-          Swal.fire("Berhasil", "Program berhasil ditambahkan", "success");
+          Swal.fire(
+            "Berhasil",
+            "Biaya program berhasil ditambahkan",
+            "success"
+          );
         }
       }
     } catch (error) {
-      console.error("Save program error:", error);
-      Swal.fire("Error", "Terjadi kesalahan saat menyimpan program", "error");
+      console.error("Save biaya program error:", error);
+      Swal.fire(
+        "Error",
+        "Terjadi kesalahan saat menyimpan biaya program",
+        "error"
+      );
     }
   };
 
@@ -173,10 +234,11 @@ const Program = () => {
   };
 
   // Filter data berdasarkan search term
-  const filteredData = dataProgram.filter(
-    (program) =>
-      program.nama_program?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      program.deskripsi?.toLowerCase().includes(searchTerm.toLowerCase())
+  const filteredData = dataBiaya.filter(
+    (biaya) =>
+      biaya.title?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      biaya.description?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      biaya.price?.toString().includes(searchTerm)
   );
 
   const totalPages = Math.ceil(filteredData.length / itemsPerPage);
@@ -197,10 +259,10 @@ const Program = () => {
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
           <div>
             <h1 className="text-4xl font-bold bg-gradient-to-r from-slate-800 to-slate-600 bg-clip-text text-transparent">
-              Program Unggulan
+              Biaya Pendidikan
             </h1>
             <p className="text-slate-600 mt-2">
-              Kelola semua program unggulan dengan mudah
+              Kelola semua biaya program pendidikan dengan mudah
             </p>
           </div>
 
@@ -210,7 +272,7 @@ const Program = () => {
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400 w-4 h-4" />
               <input
                 type="text"
-                placeholder="Cari program..."
+                placeholder="Cari biaya program..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="pl-10 pr-4 py-2.5 w-full sm:w-64 bg-white border border-slate-200 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-200"
@@ -227,7 +289,7 @@ const Program = () => {
               className="flex items-center gap-2 px-6 py-2.5 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-xl shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-200 font-medium"
             >
               <Plus className="w-4 h-4" />
-              <span>Tambah Program</span>
+              <span>Tambah Biaya</span>
             </button>
           </div>
         </div>
@@ -239,7 +301,7 @@ const Program = () => {
           <div className="flex items-center justify-center py-16">
             <div className="flex flex-col items-center gap-4">
               <div className="w-8 h-8 border-4 border-indigo-600 border-t-transparent rounded-full animate-spin"></div>
-              <p className="text-slate-600">Memuat program...</p>
+              <p className="text-slate-600">Memuat biaya program...</p>
             </div>
           </div>
         ) : (
@@ -248,7 +310,7 @@ const Program = () => {
             <div className="bg-gradient-to-r from-slate-50 to-slate-100 px-6 py-4 border-b border-slate-200">
               <div className="flex items-center justify-between">
                 <h2 className="text-lg font-semibold text-slate-800">
-                  Daftar Program ({filteredData.length})
+                  Daftar Biaya Program ({filteredData.length})
                 </h2>
                 <div className="text-sm text-slate-600">
                   Halaman {currentPage} dari {totalPages}
@@ -262,13 +324,16 @@ const Program = () => {
                 <thead className="bg-gradient-to-r from-indigo-50 to-purple-50 border-b border-slate-200">
                   <tr>
                     <th className="px-6 py-4 text-left font-semibold text-slate-700">
-                      Nama Program
+                      Judul Program
+                    </th>
+                    <th className="px-6 py-4 text-left font-semibold text-slate-700">
+                      Harga
                     </th>
                     <th className="px-6 py-4 text-left font-semibold text-slate-700">
                       Deskripsi
                     </th>
                     <th className="px-6 py-4 text-left font-semibold text-slate-700">
-                      Foto
+                      Items
                     </th>
                     <th className="px-6 py-4 text-center font-semibold text-slate-700">
                       Aksi
@@ -276,59 +341,61 @@ const Program = () => {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-100">
-                  {paginatedData.map((program, idx) => (
+                  {paginatedData.map((biaya, idx) => (
                     <tr
-                      key={program.id}
+                      key={biaya.id}
                       className={`group hover:bg-gradient-to-r hover:from-indigo-50/50 hover:to-purple-50/50 transition-all duration-200 ${
                         idx % 2 === 0 ? "bg-white" : "bg-slate-50/50"
                       }`}
                     >
                       <td className="px-6 py-4">
                         <div className="font-medium text-slate-900 line-clamp-2 max-w-xs">
-                          {program.nama_program}
+                          {biaya.title}
+                        </div>
+                      </td>
+                      <td className="px-6 py-4">
+                        <div className="flex items-center gap-1">
+                          <span className="font-semibold text-green-600">
+                            {formatCurrency(biaya.price)}
+                          </span>
                         </div>
                       </td>
                       <td className="px-6 py-4">
                         <div className="text-slate-600 line-clamp-2 max-w-sm">
-                          {program.deskripsi}
+                          {biaya.description}
                         </div>
                       </td>
                       <td className="px-6 py-4">
-                        <div className="flex items-center justify-center">
-                          <div className="w-24 h-16 rounded-lg overflow-hidden shadow-md bg-slate-100 flex items-center justify-center">
-                            <img
-                              src={program.foto_url}
-                              alt="gambar"
-                              className="w-full h-full object-cover transition-transform duration-200 group-hover:scale-105"
-                              onError={(e) => {
-                                e.target.style.display = "none";
-                                e.target.nextSibling.style.display = "flex";
-                              }}
-                            />
-                            <div className="hidden w-full h-full items-center justify-center text-slate-400 text-xs">
-                              No Image
-                            </div>
-                          </div>
+                        <div className="text-slate-600">
+                          {biaya.items && biaya.items.length > 0 ? (
+                            <span className="text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded-full">
+                              {biaya.items.length} item
+                            </span>
+                          ) : (
+                            <span className="text-xs text-slate-400">
+                              Tidak ada item
+                            </span>
+                          )}
                         </div>
                       </td>
                       <td className="px-6 py-4">
                         <div className="flex items-center justify-center gap-2">
                           <button
-                            onClick={() => handleLihat(program)}
+                            onClick={() => handleLihat(biaya)}
                             className="p-2 rounded-lg bg-blue-50 hover:bg-blue-100 text-blue-600 transition-all duration-200 hover:scale-105 hover:shadow-md"
                             title="Lihat"
                           >
                             <Eye size={16} />
                           </button>
                           <button
-                            onClick={() => handleEdit(program.id)}
+                            onClick={() => handleEdit(biaya.id)}
                             className="p-2 rounded-lg bg-amber-50 hover:bg-amber-100 text-amber-600 transition-all duration-200 hover:scale-105 hover:shadow-md"
                             title="Edit"
                           >
                             <Pencil size={16} />
                           </button>
                           <button
-                            onClick={() => handleDelete(program.id)}
+                            onClick={() => handleDelete(biaya.id)}
                             className="p-2 rounded-lg bg-red-50 hover:bg-red-100 text-red-600 transition-all duration-200 hover:scale-105 hover:shadow-md"
                             title="Hapus"
                           >
@@ -340,7 +407,7 @@ const Program = () => {
                   ))}
                   {filteredData.length === 0 && (
                     <tr>
-                      <td colSpan="4" className="text-center py-16">
+                      <td colSpan="5" className="text-center py-16">
                         <div className="flex flex-col items-center gap-4">
                           <div className="w-16 h-16 bg-slate-100 rounded-full flex items-center justify-center">
                             <Search className="w-8 h-8 text-slate-400" />
@@ -348,13 +415,13 @@ const Program = () => {
                           <div>
                             <p className="text-slate-600 font-medium">
                               {searchTerm
-                                ? "Tidak ada program yang ditemukan"
-                                : "Tidak ada program"}
+                                ? "Tidak ada biaya program yang ditemukan"
+                                : "Tidak ada biaya program"}
                             </p>
                             <p className="text-slate-400 text-sm">
                               {searchTerm
                                 ? "Coba gunakan kata kunci yang berbeda"
-                                : "Mulai dengan menambahkan program pertama"}
+                                : "Mulai dengan menambahkan biaya program pertama"}
                             </p>
                           </div>
                         </div>
@@ -381,9 +448,9 @@ const Program = () => {
 
       {/* Modal */}
       {showModal && (
-        <ProgramModal
+        <BiayaProgramModal
           onClose={handleCloseModal}
-          onSave={handleSaveProgram}
+          onSave={handleSaveBiaya}
           isEdit={isEdit}
           initialData={editData}
         />
@@ -392,4 +459,4 @@ const Program = () => {
   );
 };
 
-export default Program;
+export default BiayaPendidikan;

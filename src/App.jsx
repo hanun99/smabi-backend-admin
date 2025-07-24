@@ -19,6 +19,7 @@ import Sebaran from "./pages/Sebaran";
 import Analytics from "./pages/Analytics";
 import Setting from "./pages/Setting";
 import LoginPage from "./auth/LoginPage";
+import BiayaPendidikan from "./pages/BiayaPendidikan";
 
 // Route proteksi login
 const ProtectedRoute = ({ children }) => {
@@ -59,6 +60,7 @@ const AppRoutesWithLoader = () => {
                   <Route path="/program" element={<Program />} />
                   <Route path="/analytics" element={<Analytics />} />
                   <Route path="/setting" element={<Setting />} />
+                  <Route path="/biaya-pendidikan" element={<BiayaPendidikan />} />
                   <Route
                     path="*"
                     element={<Navigate to="/dashboard" replace />}

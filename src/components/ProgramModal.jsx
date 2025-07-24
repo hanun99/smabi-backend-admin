@@ -15,6 +15,12 @@ const ProgramModal = ({ onClose, onSave, isEdit, initialData }) => {
       setNamaProgram(initialData.nama_program || "");
       setDeskripsi(initialData.deskripsi || "");
       setPreviewImage(initialData.foto_url || null);
+    } else {
+      // Reset form untuk add mode
+      setNamaProgram("");
+      setDeskripsi("");
+      setFile(null);
+      setPreviewImage(null);
     }
   }, [isEdit, initialData]);
 
@@ -37,16 +43,30 @@ const ProgramModal = ({ onClose, onSave, isEdit, initialData }) => {
       isEdit && initialData?.foto_url ? initialData.foto_url : null
     );
     // Reset file input
-    document.getElementById("file-input").value = "";
+    const fileInput = document.getElementById("file-input");
+    if (fileInput) {
+      fileInput.value = "";
+    }
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (!namaProgram || !deskripsi) {
+    // Validasi input
+    if (!namaProgram.trim() || !deskripsi.trim()) {
       return Swal.fire({
         title: "Gagal",
-        text: "Semua kolom wajib diisi",
+        text: "Nama program dan deskripsi wajib diisi",
+        icon: "warning",
+        confirmButtonColor: "#6366f1",
+      });
+    }
+
+    // Untuk edit, jika tidak ada gambar baru dan tidak ada gambar lama, minta upload
+    if (!isEdit && !file) {
+      return Swal.fire({
+        title: "Gagal",
+        text: "Foto program wajib diupload",
         icon: "warning",
         confirmButtonColor: "#6366f1",
       });
@@ -54,53 +74,74 @@ const ProgramModal = ({ onClose, onSave, isEdit, initialData }) => {
 
     setLoading(true);
 
-    let foto_url = initialData?.foto_url || "";
+    try {
+      let foto_url = initialData?.foto_url || "";
 
-    if (file) {
-      if (file.size > 100 * 1024 * 1024) {
-        setLoading(false);
-        return Swal.fire({
-          title: "Ukuran Gambar Terlalu Besar",
-          text: "Maksimal 100MB",
-          icon: "error",
-          confirmButtonColor: "#ef4444",
-        });
+      // Jika ada file baru yang diupload
+      if (file) {
+        // Validasi ukuran file
+        if (file.size > 100 * 1024 * 1024) {
+          setLoading(false);
+          return Swal.fire({
+            title: "Ukuran Gambar Terlalu Besar",
+            text: "Maksimal 100MB",
+            icon: "error",
+            confirmButtonColor: "#ef4444",
+          });
+        }
+
+        // Upload file ke Supabase Storage
+        const fileExt = file.name.split(".").pop();
+        const fileName = `${Date.now()}_${Math.random()
+          .toString(36)
+          .substring(7)}.${fileExt}`;
+        const filePath = `programs/${fileName}`;
+
+        const { data: uploadData, error: uploadError } = await supabase.storage
+          .from("program-images")
+          .upload(filePath, file, {
+            cacheControl: "3600",
+            upsert: true,
+          });
+
+        if (uploadError) {
+          console.error("Upload error:", uploadError);
+          setLoading(false);
+          return Swal.fire({
+            title: "Gagal",
+            text: `Gagal upload gambar: ${uploadError.message}`,
+            icon: "error",
+            confirmButtonColor: "#ef4444",
+          });
+        }
+
+        // Dapatkan URL publik
+        const {
+          data: { publicUrl },
+        } = supabase.storage.from("program-images").getPublicUrl(filePath);
+
+        foto_url = publicUrl;
       }
 
-      const fileExt = file.name.split(".").pop();
-      const fileName = `${Date.now()}.${fileExt}`;
-      const filePath = `programs/${fileName}`; // Tambah folder biar aman
+      // Siapkan data yang akan disimpan
+      const programData = {
+        nama_program: namaProgram.trim(),
+        deskripsi: deskripsi.trim(),
+        foto_url: foto_url,
+      };
 
-      const { data, error } = await supabase.storage
-        .from("program-images")
-        .upload(filePath, file, {
-          cacheControl: "3600",
-          upsert: true,
-        });
-
-      if (error) {
-        console.error(error);
-        setLoading(false);
-        return Swal.fire({
-          title: "Gagal",
-          text: "Gagal upload gambar ke storage",
-          icon: "error",
-          confirmButtonColor: "#ef4444",
-        });
-      }
-
-      const {
-        data: { publicUrl },
-      } = supabase.storage.from("program-images").getPublicUrl(filePath);
-
-      foto_url = publicUrl;
+      // Panggil callback onSave
+      await onSave(programData);
+    } catch (error) {
+      console.error("Submit error:", error);
+      setLoading(false);
+      Swal.fire({
+        title: "Error",
+        text: "Terjadi kesalahan saat menyimpan data",
+        icon: "error",
+        confirmButtonColor: "#ef4444",
+      });
     }
-
-    await onSave({
-      nama_program: namaProgram,
-      deskripsi,
-      foto_url,
-    });
 
     setLoading(false);
   };
@@ -143,7 +184,7 @@ const ProgramModal = ({ onClose, onSave, isEdit, initialData }) => {
             <div className="space-y-2">
               <label className="flex items-center gap-2 text-sm font-medium text-slate-700">
                 <Type className="w-4 h-4" />
-                Nama Program
+                Nama Program *
               </label>
               <input
                 type="text"
@@ -151,6 +192,7 @@ const ProgramModal = ({ onClose, onSave, isEdit, initialData }) => {
                 value={namaProgram}
                 onChange={(e) => setNamaProgram(e.target.value)}
                 className="w-full px-4 py-3 border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-200 placeholder:text-slate-400"
+                disabled={loading}
               />
             </div>
 
@@ -158,7 +200,7 @@ const ProgramModal = ({ onClose, onSave, isEdit, initialData }) => {
             <div className="space-y-2">
               <label className="flex items-center gap-2 text-sm font-medium text-slate-700">
                 <FileText className="w-4 h-4" />
-                Deskripsi Program
+                Deskripsi Program *
               </label>
               <textarea
                 placeholder="Tulis deskripsi program unggulan di sini..."
@@ -166,6 +208,7 @@ const ProgramModal = ({ onClose, onSave, isEdit, initialData }) => {
                 onChange={(e) => setDeskripsi(e.target.value)}
                 rows={5}
                 className="w-full px-4 py-3 border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-200 placeholder:text-slate-400 resize-none"
+                disabled={loading}
               />
             </div>
 
@@ -173,7 +216,7 @@ const ProgramModal = ({ onClose, onSave, isEdit, initialData }) => {
             <div className="space-y-2">
               <label className="flex items-center gap-2 text-sm font-medium text-slate-700">
                 <Image className="w-4 h-4" />
-                Foto Program
+                Foto Program {!isEdit && "*"}
               </label>
 
               {/* Preview Image */}
@@ -190,6 +233,7 @@ const ProgramModal = ({ onClose, onSave, isEdit, initialData }) => {
                         type="button"
                         onClick={removeImage}
                         className="p-2 bg-red-500 text-white rounded-full hover:bg-red-600 transition-colors duration-200"
+                        disabled={loading}
                       >
                         <X className="w-4 h-4" />
                       </button>
@@ -209,11 +253,14 @@ const ProgramModal = ({ onClose, onSave, isEdit, initialData }) => {
                   accept="image/*"
                   onChange={handleFileChange}
                   className="hidden"
+                  disabled={loading}
                 />
                 <label
                   htmlFor="file-input"
                   className={`flex items-center justify-center gap-3 w-full p-6 border-2 border-dashed rounded-xl cursor-pointer transition-all duration-200 ${
-                    previewImage
+                    loading
+                      ? "opacity-50 cursor-not-allowed"
+                      : previewImage
                       ? "border-slate-300 bg-slate-50 hover:bg-slate-100"
                       : "border-indigo-300 bg-indigo-50 hover:bg-indigo-100"
                   }`}
@@ -235,6 +282,7 @@ const ProgramModal = ({ onClose, onSave, isEdit, initialData }) => {
 
               <p className="text-xs text-slate-500">
                 Format: JPG, PNG, JPEG. Maksimal 100MB.
+                {!isEdit && " Wajib upload foto untuk program baru."}
               </p>
             </div>
 
@@ -278,8 +326,10 @@ const ProgramModal = ({ onClose, onSave, isEdit, initialData }) => {
                 {loading ? (
                   <div className="flex items-center gap-2">
                     <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                    Menyimpan...
+                    {isEdit ? "Mengupdate..." : "Menyimpan..."}
                   </div>
+                ) : isEdit ? (
+                  "Update"
                 ) : (
                   "Simpan"
                 )}
