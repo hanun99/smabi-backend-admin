@@ -8,7 +8,6 @@ const PageLoader = () => {
         alt="Loading Logo"
         className="w-24 h-auto animate-pulse mb-4"
       />
-      <p className="text-sm text-gray-700 animate-pulse">Memuat halaman...</p>
     </div>
   );
 };

@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Eye, EyeOff, Lock, User } from "lucide-react";
+import Swal from "sweetalert2";
 
 const LoginPage = () => {
   const [username, setUsername] = useState("");
@@ -10,9 +11,11 @@ const LoginPage = () => {
   const navigate = useNavigate();
 
   const daftarPengguna = [
-    { username: "admin", password: "admin123" },
-    { username: "guru1", password: "guru123" },
-    { username: "Luzman", password: "123123" },
+    { username: "Admin", password: "admin123" },
+    { username: "Luzman", password: "admin123" },
+    { username: "Dewi", password: "admin123" },
+    { username: "Ovin", password: "admin123" },
+    { username: "Difa", password: "admin123" },
   ];
 
   const handleLogin = async (e) => {
@@ -28,9 +31,23 @@ const LoginPage = () => {
     if (userValid) {
       localStorage.setItem("isLoggedIn", "true");
       localStorage.setItem("username", userValid.username);
-      navigate("/dashboard");
+
+      Swal.fire({
+        title: `Selamat Datang, ${userValid.username}!`,
+        text: "Anda berhasil masuk ke Admin SMABI.",
+        icon: "success",
+        confirmButtonColor: "#4f46e5", // indigo-600
+        confirmButtonText: "Lanjut ke Dashboard",
+      }).then(() => {
+        navigate("/dashboard");
+      });
     } else {
-      alert("Username atau kata sandi salah!");
+      Swal.fire({
+        title: "Login Gagal",
+        text: "Username atau kata sandi salah!",
+        icon: "error",
+        confirmButtonText: "Coba Lagi",
+      });
     }
 
     setIsLoading(false);

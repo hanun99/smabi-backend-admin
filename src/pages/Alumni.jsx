@@ -60,16 +60,17 @@ const Alumni = () => {
 
   const handleLihat = (alumni) => {
     Swal.fire({
-      title: alumni.nama,
+      title: `<h3 style="font-size: 1.2rem; margin-bottom: 0.5rem;">${alumni.nama}</h3>`,
       html: `
-        <div class="text-left space-y-2">
-          <p><strong>Universitas:</strong> ${alumni.universitas}</p>
-          <p><strong>Jurusan:</strong> ${alumni.jurusan}</p>
-          <p><strong>Jalur:</strong> ${alumni.jalur}</p>
-          <p><strong>Angkatan:</strong> ${alumni.angkatan}</p>
-        </div>
-      `,
+      <div style="text-align: left; font-size: 0.9rem; line-height: 1.4;">
+        <p><strong>Universitas:</strong> ${alumni.universitas}</p>
+        <p><strong>Jurusan:</strong> ${alumni.jurusan}</p>
+        <p><strong>Jalur:</strong> ${alumni.jalur}</p>
+        <p><strong>Angkatan:</strong> ${alumni.angkatan}</p>
+      </div>
+    `,
       icon: "info",
+      width: 400,
       confirmButtonText: "Tutup",
       confirmButtonColor: "#6366f1",
     });
@@ -235,20 +236,20 @@ const Alumni = () => {
   const angkatanStats = getAngkatanStats();
 
   return (
-    <div className="min-h-screen from-slate-50 via-white to-slate-100 p-6">
-      <div className="max-w-7xl mx-auto">
-        {/* Header */}
-        <div className="mb-8">
-          <div className="flex items-center justify-between mb-6">
-            <div className="flex items-center gap-4">
-              <div className="w-12 h-12 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-xl flex items-center justify-center shadow-lg">
-                <Users className="w-6 h-6 text-white" />
+    <div className="min-h-screen from-slate-50 via-white to-slate-100 p-3 sm:p-4">
+      <div className="max-w-6xl mx-auto">
+        {/* Header - Lebih Kompak */}
+        <div className="mb-6">
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-xl flex items-center justify-center shadow-lg">
+                <Users className="w-5 h-5 text-white" />
               </div>
               <div>
-                <h1 className="text-3xl font-bold bg-gradient-to-r from-gray-900 to-gray-600 bg-clip-text text-transparent">
+                <h1 className="text-xl sm:text-2xl font-bold bg-gradient-to-r from-gray-900 to-gray-600 bg-clip-text text-transparent">
                   Data Alumni
                 </h1>
-                <p className="text-gray-500 text-sm font-medium">
+                <p className="text-gray-500 text-xs font-medium">
                   Kelola data alumni yang terdaftar
                 </p>
               </div>
@@ -256,41 +257,41 @@ const Alumni = () => {
 
             <button
               onClick={() => setShowModal(true)}
-              className="group relative overflow-hidden bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white px-6 py-3 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1 flex items-center gap-3"
+              className="group relative overflow-hidden bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white px-4 py-2 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1 flex items-center gap-2"
             >
               <Plus
-                size={20}
+                size={18}
                 className="group-hover:rotate-90 transition-transform duration-300"
               />
-              <span className="font-medium">Tambah Alumni</span>
+              <span className="font-medium text-sm">Tambah Alumni</span>
             </button>
           </div>
 
-          {/* Search and Filter */}
-          <div className="flex flex-col lg:flex-row gap-4 mb-6">
+          {/* Search and Filter - Spacing Dikurangi */}
+          <div className="flex flex-col lg:flex-row gap-3 mb-4">
             {/* Search Bar */}
             <div className="relative flex-1">
-              <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                <Search className="h-5 w-5 text-gray-400" />
+              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <Search className="h-4 w-4 text-gray-400" />
               </div>
               <input
                 type="text"
                 placeholder="Cari alumni berdasarkan nama, jurusan, jalur, universitas..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full pl-12 pr-4 py-3 bg-white/70 backdrop-blur-sm border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-200"
+                className="w-full pl-10 pr-3 py-2.5 bg-white/70 backdrop-blur-sm border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-200 text-sm"
               />
             </div>
 
             {/* Filter Angkatan */}
             <div className="relative">
-              <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                <Filter className="h-5 w-5 text-gray-400" />
+              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <Filter className="h-4 w-4 text-gray-400" />
               </div>
               <select
                 value={selectedAngkatan}
                 onChange={(e) => setSelectedAngkatan(e.target.value)}
-                className="pl-12 pr-10 py-3 bg-white/70 backdrop-blur-sm border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-200 appearance-none cursor-pointer min-w-48"
+                className="pl-10 pr-8 py-2.5 bg-white/70 backdrop-blur-sm border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-200 appearance-none cursor-pointer min-w-44 text-sm"
               >
                 <option value="all">Semua Angkatan</option>
                 {uniqueAngkatan.map((angkatan) => (
@@ -299,81 +300,81 @@ const Alumni = () => {
                   </option>
                 ))}
               </select>
-              <div className="absolute inset-y-0 right-0 pr-4 flex items-center pointer-events-none">
-                <ChevronDown className="h-5 w-5 text-gray-400" />
+              <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+                <ChevronDown className="h-4 w-4 text-gray-400" />
               </div>
             </div>
           </div>
 
-          {/* Stats */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-            <div className="bg-white/70 backdrop-blur-sm rounded-xl p-6 shadow-lg border border-white/20">
+          {/* Stats - Padding dan Gap Dikurangi */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mb-4">
+            <div className="bg-white/70 backdrop-blur-sm rounded-xl p-4 shadow-lg border border-white/20">
               <div className="flex items-center justify-between">
                 <div>
-                  <div className="text-2xl font-bold text-gray-900">
+                  <div className="text-xl font-bold text-gray-900">
                     {filteredAlumni.length}
                   </div>
-                  <div className="text-gray-600">
+                  <div className="text-gray-600 text-sm">
                     Alumni{" "}
                     {searchTerm || selectedAngkatan !== "all"
                       ? "ditemukan"
                       : "total"}
                   </div>
                 </div>
-                <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center">
-                  <Users className="w-6 h-6 text-white" />
+                <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center">
+                  <Users className="w-5 h-5 text-white" />
                 </div>
               </div>
             </div>
 
-            <div className="bg-white/70 backdrop-blur-sm rounded-xl p-6 shadow-lg border border-white/20">
+            <div className="bg-white/70 backdrop-blur-sm rounded-xl p-4 shadow-lg border border-white/20">
               <div className="flex items-center justify-between">
                 <div>
-                  <div className="text-2xl font-bold text-gray-900">
+                  <div className="text-xl font-bold text-gray-900">
                     {uniqueAngkatan.length}
                   </div>
-                  <div className="text-gray-600">Total Angkatan</div>
+                  <div className="text-gray-600 text-sm">Total Angkatan</div>
                 </div>
-                <div className="w-12 h-12 bg-gradient-to-br from-green-500 to-green-600 rounded-lg flex items-center justify-center">
-                  <Filter className="w-6 h-6 text-white" />
+                <div className="w-10 h-10 bg-gradient-to-br from-green-500 to-green-600 rounded-lg flex items-center justify-center">
+                  <Filter className="w-5 h-5 text-white" />
                 </div>
               </div>
             </div>
 
-            <div className="bg-white/70 backdrop-blur-sm rounded-xl p-6 shadow-lg border border-white/20">
+            <div className="bg-white/70 backdrop-blur-sm rounded-xl p-4 shadow-lg border border-white/20">
               <div className="flex items-center justify-between">
                 <div>
-                  <div className="text-2xl font-bold text-gray-900">
+                  <div className="text-xl font-bold text-gray-900">
                     {selectedAngkatan === "all"
                       ? dataAlumni.length
                       : angkatanStats[selectedAngkatan] || 0}
                   </div>
-                  <div className="text-gray-600">
+                  <div className="text-gray-600 text-sm">
                     {selectedAngkatan === "all"
                       ? "Total Alumni"
                       : `Angkatan ${selectedAngkatan}`}
                   </div>
                 </div>
-                <div className="w-12 h-12 bg-gradient-to-br from-purple-500 to-purple-600 rounded-lg flex items-center justify-center">
-                  <Users className="w-6 h-6 text-white" />
+                <div className="w-10 h-10 bg-gradient-to-br from-purple-500 to-purple-600 rounded-lg flex items-center justify-center">
+                  <Users className="w-5 h-5 text-white" />
                 </div>
               </div>
             </div>
           </div>
 
-          {/* Filter Info */}
+          {/* Filter Info - Padding Dikurangi */}
           {(searchTerm || selectedAngkatan !== "all") && (
-            <div className="bg-white/70 backdrop-blur-sm rounded-xl p-4 shadow-lg border border-white/20 mb-6">
+            <div className="bg-white/70 backdrop-blur-sm rounded-xl p-3 shadow-lg border border-white/20 mb-4">
               <div className="flex items-center justify-between">
-                <div className="flex items-center gap-4">
-                  <span className="text-sm text-gray-600">Filter aktif:</span>
+                <div className="flex items-center gap-3">
+                  <span className="text-xs text-gray-600">Filter aktif:</span>
                   {searchTerm && (
-                    <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                    <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
                       Pencarian: "{searchTerm}"
                     </span>
                   )}
                   {selectedAngkatan !== "all" && (
-                    <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                    <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
                       Angkatan: {selectedAngkatan}
                     </span>
                   )}
@@ -383,7 +384,7 @@ const Alumni = () => {
                     setSearchTerm("");
                     setSelectedAngkatan("all");
                   }}
-                  className="text-sm text-indigo-600 hover:text-indigo-800 font-medium"
+                  className="text-xs text-indigo-600 hover:text-indigo-800 font-medium"
                 >
                   Reset semua filter
                 </button>
@@ -392,12 +393,12 @@ const Alumni = () => {
           )}
         </div>
 
-        {/* Table */}
+        {/* Table - Padding Dikurangi */}
         {loading ? (
-          <div className="bg-white/70 backdrop-blur-sm rounded-xl p-12 shadow-lg border border-white/20">
+          <div className="bg-white/70 backdrop-blur-sm rounded-xl p-8 shadow-lg border border-white/20">
             <div className="flex items-center justify-center">
-              <div className="animate-spin rounded-full h-8 w-8 border-2 border-indigo-600 border-t-transparent"></div>
-              <span className="ml-3 text-gray-600">Memuat data...</span>
+              <div className="animate-spin rounded-full h-6 w-6 border-2 border-indigo-600 border-t-transparent"></div>
+              <span className="ml-2 text-gray-600 text-sm">Memuat data...</span>
             </div>
           </div>
         ) : (
@@ -406,25 +407,25 @@ const Alumni = () => {
               <table className="min-w-full">
                 <thead className="bg-gradient-to-r from-indigo-50 to-purple-50">
                   <tr>
-                    <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700 uppercase tracking-wider">
+                    <th className="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
                       No
                     </th>
-                    <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700 uppercase tracking-wider">
+                    <th className="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
                       Nama
                     </th>
-                    <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700 uppercase tracking-wider">
+                    <th className="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
                       Jurusan
                     </th>
-                    <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700 uppercase tracking-wider">
+                    <th className="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
                       Jalur
                     </th>
-                    <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700 uppercase tracking-wider">
+                    <th className="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
                       Universitas
                     </th>
-                    <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700 uppercase tracking-wider">
+                    <th className="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
                       Angkatan
                     </th>
-                    <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700 uppercase tracking-wider">
+                    <th className="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
                       Aksi
                     </th>
                   </tr>
@@ -437,59 +438,59 @@ const Alumni = () => {
                         idx % 2 === 0 ? "bg-white/50" : "bg-gray-50/50"
                       } hover:bg-indigo-50/70 transition-all duration-200`}
                     >
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-500">
                         {startIndex + idx + 1}
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="font-medium text-gray-900">
+                      <td className="px-4 py-3 whitespace-nowrap">
+                        <div className="font-medium text-gray-900 text-sm">
                           {alumni.nama}
                         </div>
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-gray-700">
+                      <td className="px-4 py-3 whitespace-nowrap text-gray-700 text-sm">
                         {alumni.jurusan}
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                      <td className="px-4 py-3 whitespace-nowrap">
+                        <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
                           {alumni.jalur}
                         </span>
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-gray-700">
+                      <td className="px-4 py-3 whitespace-nowrap text-gray-700 text-sm">
                         {alumni.universitas}
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                      <td className="px-4 py-3 whitespace-nowrap">
+                        <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
                           {alumni.angkatan || "Tidak ada"}
                         </span>
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="flex gap-2">
+                      <td className="px-4 py-3 whitespace-nowrap">
+                        <div className="flex gap-1">
                           <button
                             onClick={() => handleLihat(alumni)}
-                            className="group p-2 rounded-lg bg-blue-100 hover:bg-blue-200 text-blue-600 transition-all duration-200 hover:scale-110"
+                            className="group p-1.5 rounded-lg bg-blue-100 hover:bg-blue-200 text-blue-600 transition-all duration-200 hover:scale-110"
                             title="Lihat Detail"
                           >
                             <Eye
-                              size={16}
+                              size={14}
                               className="group-hover:scale-110 transition-transform"
                             />
                           </button>
                           <button
                             onClick={() => handleEdit(alumni.id)}
-                            className="group p-2 rounded-lg bg-yellow-100 hover:bg-yellow-200 text-yellow-700 transition-all duration-200 hover:scale-110"
+                            className="group p-1.5 rounded-lg bg-yellow-100 hover:bg-yellow-200 text-yellow-700 transition-all duration-200 hover:scale-110"
                             title="Edit"
                           >
                             <Pencil
-                              size={16}
+                              size={14}
                               className="group-hover:scale-110 transition-transform"
                             />
                           </button>
                           <button
                             onClick={() => handleDelete(alumni.id)}
-                            className="group p-2 rounded-lg bg-red-100 hover:bg-red-200 text-red-600 transition-all duration-200 hover:scale-110"
+                            className="group p-1.5 rounded-lg bg-red-100 hover:bg-red-200 text-red-600 transition-all duration-200 hover:scale-110"
                             title="Hapus"
                           >
                             <Trash2
-                              size={16}
+                              size={14}
                               className="group-hover:scale-110 transition-transform"
                             />
                           </button>
@@ -499,10 +500,10 @@ const Alumni = () => {
                   ))}
                   {currentAlumni.length === 0 && (
                     <tr>
-                      <td colSpan="7" className="text-center py-12">
-                        <div className="flex flex-col items-center gap-3">
-                          <Users className="w-12 h-12 text-gray-400" />
-                          <p className="text-gray-500 font-medium">
+                      <td colSpan="7" className="text-center py-8">
+                        <div className="flex flex-col items-center gap-2">
+                          <Users className="w-10 h-10 text-gray-400" />
+                          <p className="text-gray-500 font-medium text-sm">
                             {searchTerm || selectedAngkatan !== "all"
                               ? "Tidak ada alumni yang ditemukan"
                               : "Belum ada data alumni"}
@@ -513,7 +514,7 @@ const Alumni = () => {
                                 setSearchTerm("");
                                 setSelectedAngkatan("all");
                               }}
-                              className="text-indigo-600 hover:text-indigo-800 font-medium"
+                              className="text-indigo-600 hover:text-indigo-800 font-medium text-sm"
                             >
                               Reset filter
                             </button>
@@ -526,11 +527,11 @@ const Alumni = () => {
               </table>
             </div>
 
-            {/* Pagination */}
+            {/* Pagination - Padding Dikurangi */}
             {filteredAlumni.length > 0 && (
-              <div className="px-6 py-4 border-t border-gray-200">
+              <div className="px-4 py-3 border-t border-gray-200">
                 <div className="flex items-center justify-between">
-                  <div className="text-sm text-gray-700">
+                  <div className="text-xs text-gray-700">
                     Menampilkan {startIndex + 1} sampai{" "}
                     {Math.min(endIndex, filteredAlumni.length)} dari{" "}
                     {filteredAlumni.length} alumni
