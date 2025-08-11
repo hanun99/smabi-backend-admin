@@ -20,6 +20,7 @@ import Analytics from "./pages/Analytics";
 import Setting from "./pages/Setting";
 import LoginPage from "./auth/LoginPage";
 import BiayaPendidikan from "./pages/BiayaPendidikan";
+import KaryaTulis from "./pages/KaryaTulis";
 
 // Route proteksi login
 const ProtectedRoute = ({ children }) => {
@@ -58,6 +59,7 @@ const AppRoutesWithLoader = () => {
                   <Route path="/testimoni" element={<Testimoni />} />
                   <Route path="/sebaran" element={<Sebaran />} />
                   <Route path="/program" element={<Program />} />
+                  <Route path="/karya-tulis" element={<KaryaTulis />} />
                   <Route path="/analytics" element={<Analytics />} />
                   <Route path="/setting" element={<Setting />} />
                   <Route path="/biaya-pendidikan" element={<BiayaPendidikan />} />
