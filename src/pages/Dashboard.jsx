@@ -6,8 +6,36 @@ import {
   MessageSquare,
   GraduationCap,
 } from "lucide-react";
-import supabase from "../utils/SupaClient";
+import supabase from "../utils/SupaClient"; // Asumsi path ini sudah benar
 
+// Komponen Card yang dioptimalkan untuk tampilan lebih bersih
+const DashboardCard = ({ title, count, icon: Icon, color, description }) => (
+  <div
+    className={`relative rounded-2xl p-6 shadow-xl transition-all duration-300 transform-gpu hover:scale-[1.02] overflow-hidden`}
+    style={{
+      background: `linear-gradient(to bottom right, #ffffff, ${color}33)`, // Tambahan gradien ringan
+    }}
+  >
+    {/* Icon dengan background circle */}
+    <div
+      className={`absolute top-4 right-4 w-12 h-12 rounded-full flex items-center justify-center`}
+      style={{ backgroundColor: color + "22" }}
+    >
+      <Icon className="w-6 h-6" style={{ color: color }} />
+    </div>
+
+    {/* Konten teks */}
+    <div className="flex flex-col">
+      <h3 className="text-sm font-medium text-gray-500">{title}</h3>
+      <p className="text-3xl font-bold mt-1 text-gray-800">
+        {count.toLocaleString()}
+      </p>
+      <p className="text-xs text-gray-400 mt-2">{description}</p>
+    </div>
+  </div>
+);
+
+// Komponen utama Dashboard
 const Dashboard = () => {
   const [totals, setTotals] = useState({
     alumni: 0,
@@ -22,15 +50,16 @@ const Dashboard = () => {
       const counts = {};
 
       for (const table of tables) {
-        const { count, error } = await supabase
-          .from(table)
-          .select("*", { count: "exact", head: true });
+        try {
+          const { count, error } = await supabase
+            .from(table)
+            .select("*", { count: "exact", head: true });
 
-        if (error) {
+          if (error) throw error;
+          counts[table] = count;
+        } catch (error) {
           console.error(`Error fetching ${table}:`, error.message);
           counts[table] = 0;
-        } else {
-          counts[table] = count;
         }
       }
 
@@ -40,79 +69,70 @@ const Dashboard = () => {
     fetchData();
   }, []);
 
+  // Data card dengan palet warna baru
   const cardData = [
     {
       title: "Total Alumni",
       count: totals.alumni,
       icon: Users,
-      color: "from-blue-500 to-blue-600",
-      bgColor: "bg-blue-50",
-      iconColor: "text-blue-600",
+      color: "#3B82F6", // Biru (blue-500)
       description: "Alumni terdaftar",
     },
     {
       title: "Total Berita",
       count: totals.berita,
       icon: FileText,
-      color: "from-emerald-500 to-emerald-600",
-      bgColor: "bg-emerald-50",
-      iconColor: "text-emerald-600",
+      color: "#10B981", // Hijau (emerald-500)
       description: "Artikel dipublikasi",
     },
     {
       title: "Total Testimoni",
       count: totals.testimoni,
       icon: MessageSquare,
-      color: "from-amber-500 to-amber-600",
-      bgColor: "bg-amber-50",
-      iconColor: "text-amber-600",
+      color: "#F59E0B", // Kuning (amber-500)
       description: "Testimoni diterima",
     },
     {
       title: "Sebaran Universitas",
       count: totals.universitas,
       icon: GraduationCap,
-      color: "from-purple-500 to-purple-600",
-      bgColor: "bg-purple-50",
-      iconColor: "text-purple-600",
+      color: "#8B5CF6", // Ungu (purple-500)
       description: "Universitas terdaftar",
     },
   ];
 
   return (
-    <div className="min-h-screen from-slate-50 via-white to-slate-100 p-2 sm:p-3 md:p-4">
-      <div className=" mx-auto w-full">
-        {/* Header - Lebih Kompak */}
-        <div className="mb-4">
-          <div className="flex items-center gap-2 mb-1">
-            <div className="w-8 h-8 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-lg flex items-center justify-center shadow-md">
-              <TrendingUp className="w-4 h-4 text-white" />
+    <div className="min-h-screen  p-8">
+      <div className="max-w-7xl mx-auto">
+        {/* Header dengan tampilan lebih elegan */}
+        <div className="mb-8">
+          <div className="flex items-center gap-3 mb-2">
+            <div className="w-10 h-10 bg-indigo-500 rounded-lg flex items-center justify-center shadow-lg">
+              <TrendingUp className="w-5 h-5 text-white" />
             </div>
             <div>
-              <h1 className="text-lg sm:text-xl font-bold bg-gradient-to-r from-gray-900 to-gray-600 bg-clip-text text-transparent">
-                Dashboard
-              </h1>
-              <p className="text-gray-500 text-xs font-medium">
+              <h1 className="text-2xl font-bold text-gray-900">Dashboard</h1>
+              <p className="text-sm font-medium text-gray-500">
                 Statistik Umum Sistem
               </p>
             </div>
           </div>
         </div>
 
-        {/* Stats Grid - Spacing Dikurangi */}
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+        {/* Grid Stats yang lebih rapi */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
           {cardData.map((card, index) => (
-            <Card key={index} {...card} />
+            <DashboardCard key={index} {...card} />
           ))}
         </div>
 
-        {/* Additional Info - Lebih Kecil */}
-        <div className="mt-4 bg-white/70 backdrop-blur-sm rounded-xl p-3 shadow border border-white/20">
-          <h3 className="text-sm font-semibold text-gray-800 mb-1">
+        {/* Informasi Tambahan */}
+        <div className="mt-8 bg-white rounded-xl p-5 shadow-lg">
+          <h3 className="text-sm font-semibold text-gray-800 mb-2">
             Informasi Sistem
           </h3>
-          <p className="text-gray-600 text-xs">
-            Data diperbarui secara real-time dari database. Refresh halaman
+          <p className="text-gray-500 text-sm">
+            Data diperbarui secara otomatis. Pastikan koneksi internet stabil
             untuk mendapatkan data terbaru.
           </p>
         </div>
@@ -120,50 +140,5 @@ const Dashboard = () => {
     </div>
   );
 };
-
-const Card = ({
-  title,
-  count,
-  icon: Icon,
-  color,
-  bgColor,
-  iconColor,
-  description,
-}) => (
-  <div className="group relative overflow-hidden">
-    {/* Background gradient */}
-    <div
-      className={`absolute inset-0 bg-gradient-to-br ${color} opacity-0 group-hover:opacity-5 transition-opacity duration-300`}
-    />
-
-    {/* Card - Padding Dikurangi */}
-    <div className="relative bg-white/80 backdrop-blur-sm p-3 sm:p-4 rounded-xl shadow-md border border-white/20 hover:shadow-lg transition-all duration-300 hover:-translate-y-1">
-      {/* Icon - Ukuran Dikecilkan */}
-      <div
-        className={`w-8 h-8 ${bgColor} rounded-lg flex items-center justify-center mb-2 group-hover:scale-105 transition-transform duration-300`}
-      >
-        <Icon className={`w-4 h-4 ${iconColor}`} />
-      </div>
-
-      {/* Content */}
-      <div className="space-y-1">
-        <h3 className="text-xs font-semibold text-gray-600 uppercase tracking-wide">
-          {title}
-        </h3>
-
-        <p className="text-lg sm:text-xl font-bold text-gray-900 group-hover:scale-105 transition-transform duration-300">
-          {count.toLocaleString()}
-        </p>
-
-        <p className="text-xs text-gray-500 mt-1">{description}</p>
-      </div>
-
-      {/* Decorative - Ukuran Dikurangi */}
-      <div
-        className={`absolute top-0 right-0 w-12 h-12 sm:w-16 sm:h-16 bg-gradient-to-br ${color} opacity-5 rounded-full -translate-y-8 translate-x-8 group-hover:scale-150 transition-transform duration-500`}
-      />
-    </div>
-  </div>
-);
 
 export default Dashboard;

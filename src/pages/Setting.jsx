@@ -207,7 +207,7 @@ const Setting = () => {
                 <div className="space-y-3">
                   <div className="flex justify-between">
                     <span className="text-gray-600">Versi Admin</span>
-                    <span className="text-gray-900 font-medium">v1.1.0</span>
+                    <span className="text-gray-900 font-medium">v2.1.0</span>
                   </div>
                   <div className="flex justify-between">
                     <span className="text-gray-600">Database</span>
